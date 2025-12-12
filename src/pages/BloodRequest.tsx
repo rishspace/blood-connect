@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Heart, MapPin, Building2, FileText, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BloodTypeSelector } from '@/components/BloodTypeSelector';
@@ -11,15 +11,23 @@ export default function BloodRequest() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const isEmergency = searchParams.get('emergency') === 'true';
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     bloodType: '',
-    urgency: 'normal' as 'normal' | 'urgent' | 'emergency',
+    urgency: (isEmergency ? 'emergency' : 'normal') as 'normal' | 'urgent' | 'emergency',
     hospital: '',
     location: '',
     unitsNeeded: 1,
     description: '',
   });
+
+  useEffect(() => {
+    if (isEmergency) {
+      setFormData(prev => ({ ...prev, urgency: 'emergency' }));
+    }
+  }, [isEmergency]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

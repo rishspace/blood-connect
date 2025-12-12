@@ -1,4 +1,5 @@
 import { AlertTriangle, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 
 export function EmergencyBanner() {
@@ -28,10 +29,12 @@ export function EmergencyBanner() {
             </div>
           </div>
 
-          <Button variant="heroOutline" size="lg" className="flex-shrink-0">
-            Respond to SOS
-            <ArrowRight className="w-5 h-5" />
-          </Button>
+          <Link to="/dashboard?tab=requests">
+            <Button variant="heroOutline" size="lg" className="flex-shrink-0">
+              Respond to SOS
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
