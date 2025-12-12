@@ -1,11 +1,12 @@
 import { Heart, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const footerLinks = {
   product: [
-    { label: "Find Donors", href: "#find" },
-    { label: "Become a Donor", href: "#donate" },
-    { label: "Blood Banks", href: "#banks" },
-    { label: "Campaigns", href: "#campaigns" },
+    { label: "Find Donors", href: "/dashboard" },
+    { label: "Become a Donor", href: "/signup" },
+    { label: "Request Blood", href: "/request" },
+    { label: "Dashboard", href: "/dashboard" },
   ],
   resources: [
     { label: "FAQs", href: "#faqs" },
@@ -34,18 +35,33 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const renderLink = (link: { label: string; href: string }) => {
+    if (link.href.startsWith('/')) {
+      return (
+        <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+          {link.label}
+        </Link>
+      );
+    }
+    return (
+      <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+        {link.label}
+      </a>
+    );
+  };
+
   return (
     <footer className="bg-foreground text-primary-foreground">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="/" className="flex items-center gap-2 mb-6">
+            <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <Heart className="w-5 h-5 text-primary-foreground fill-current" />
               </div>
               <span className="font-bold text-xl">BloodLink</span>
-            </a>
+            </Link>
             <p className="text-primary-foreground/70 mb-6 max-w-sm">
               Connecting blood donors and seekers to save lives. Join our community 
               and make a difference today.
@@ -71,11 +87,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
+                <li key={link.label}>{renderLink(link)}</li>
               ))}
             </ul>
           </div>
@@ -84,11 +96,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
+                <li key={link.label}>{renderLink(link)}</li>
               ))}
             </ul>
           </div>
@@ -97,11 +105,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
+                <li key={link.label}>{renderLink(link)}</li>
               ))}
             </ul>
           </div>
@@ -110,11 +114,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
+                <li key={link.label}>{renderLink(link)}</li>
               ))}
             </ul>
           </div>

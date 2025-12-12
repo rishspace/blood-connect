@@ -2,6 +2,7 @@ import { MapPin, Clock, Phone, MessageCircle, Droplets } from "lucide-react";
 import { BloodTypeBadge } from "./BloodTypeBadge";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface DonorCardProps {
   name: string;
@@ -24,6 +25,22 @@ export function DonorCard({
   location,
   className,
 }: DonorCardProps) {
+  const { toast } = useToast();
+
+  const handleCall = () => {
+    toast({
+      title: "Calling " + name,
+      description: "Demo: In a real app, this would initiate a phone call.",
+    });
+  };
+
+  const handleMessage = () => {
+    toast({
+      title: "Message to " + name,
+      description: "Demo: In a real app, this would open a chat window.",
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -77,11 +94,11 @@ export function DonorCard({
           </div>
 
           <div className="flex gap-2">
-            <Button size="sm" variant="default" className="flex-1">
+            <Button size="sm" variant="default" className="flex-1" onClick={handleCall} disabled={!isAvailable}>
               <Phone className="w-4 h-4" />
               Call
             </Button>
-            <Button size="sm" variant="outline" className="flex-1">
+            <Button size="sm" variant="outline" className="flex-1" onClick={handleMessage} disabled={!isAvailable}>
               <MessageCircle className="w-4 h-4" />
               Message
             </Button>

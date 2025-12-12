@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Heart,
   Droplets,
@@ -32,16 +32,27 @@ import {
   clearDatabase,
   BloodRequest,
   User as DBUser,
+  addResponseToRequest,
 } from '@/lib/localDatabase';
 
 export default function Dashboard() {
   const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
   const [stats, setStats] = useState({ totalDonors: 0, totalDonations: 0, livesSaved: 0, openRequests: 0, fulfilledRequests: 0 });
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [donors, setDonors] = useState<DBUser[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'donors' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'donors' | 'settings'>(
+    (tabParam as 'overview' | 'requests' | 'donors' | 'settings') || 'overview'
+  );
+
+  useEffect(() => {
+    if (tabParam && ['overview', 'requests', 'donors', 'settings'].includes(tabParam)) {
+      setActiveTab(tabParam as typeof activeTab);
+    }
+  }, [tabParam]);
 
   useEffect(() => {
     if (!user) {
@@ -338,7 +349,23 @@ export default function Dashboard() {
                     </div>
                     {user.role === 'donor' && (
                       <div className="mt-4 pt-4 border-t border-border">
-                        <Button size="sm" className="w-full">
+                        <Button 
+                          size="sm" 
+                          className="w-full"
+                          onClick={() => {
+                            addResponseToRequest(request.id, {
+                              donorId: user.id,
+                              donorName: user.name,
+                              message: `I am available to donate ${request.bloodType} blood.`,
+                              status: 'pending',
+                            });
+                            toast({
+                              title: 'Response sent!',
+                              description: `Your response to ${request.seekerName}'s request has been submitted.`,
+                            });
+                            loadData();
+                          }}
+                        >
                           Respond to Request
                         </Button>
                       </div>

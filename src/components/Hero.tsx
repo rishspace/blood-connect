@@ -1,10 +1,43 @@
 import { Heart, Search, MapPin, ArrowRight, Droplets } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { BloodTypeSelector } from "./BloodTypeSelector";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export function Hero() {
   const [selectedBloodType, setSelectedBloodType] = useState<string | null>(null);
+  const [location, setLocation] = useState("");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSearch = () => {
+    if (!selectedBloodType) {
+      toast({
+        title: "Select Blood Type",
+        description: "Please select a blood type to search for donors.",
+        variant: "destructive",
+      });
+      return;
+    }
+    // Navigate to dashboard with search params
+    navigate(`/dashboard?bloodType=${selectedBloodType}&location=${encodeURIComponent(location)}`);
+  };
+
+  const handleEmergencySOS = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to create an emergency request.",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+    navigate("/request?emergency=true");
+  };
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
@@ -45,15 +78,19 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="xl" variant="hero">
-                <Search className="w-5 h-5" />
-                Find Donors
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button size="xl" variant="outline">
-                <Heart className="w-5 h-5" />
-                Become a Donor
-              </Button>
+              <Link to="/dashboard">
+                <Button size="xl" variant="hero">
+                  <Search className="w-5 h-5" />
+                  Find Donors
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="xl" variant="outline">
+                  <Heart className="w-5 h-5" />
+                  Become a Donor
+                </Button>
+              </Link>
             </div>
 
             {/* Quick Stats */}
@@ -107,13 +144,15 @@ export function Hero() {
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
                       type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
                       placeholder="Enter city or use current location"
                       className="w-full h-12 pl-12 pr-4 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     />
                   </div>
                 </div>
 
-                <Button className="w-full" size="lg" disabled={!selectedBloodType}>
+                <Button className="w-full" size="lg" onClick={handleSearch}>
                   <Search className="w-4 h-4" />
                   Search Donors
                 </Button>
@@ -121,7 +160,10 @@ export function Hero() {
 
               {/* Emergency CTA */}
               <div className="pt-4 border-t border-border">
-                <button className="w-full flex items-center justify-center gap-2 py-3 text-primary hover:text-primary/80 transition-colors">
+                <button 
+                  onClick={handleEmergencySOS}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-primary hover:text-primary/80 transition-colors"
+                >
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>

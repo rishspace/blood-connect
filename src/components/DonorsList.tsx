@@ -1,65 +1,21 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { DonorCard } from "./DonorCard";
 import { MapPin, Filter, ArrowUpDown } from "lucide-react";
 import { Button } from "./ui/button";
-
-const mockDonors = [
-  {
-    name: "Sarah Johnson",
-    bloodType: "O+",
-    distance: "1.2 km",
-    lastDonation: "3 months ago",
-    isAvailable: true,
-    donationCount: 12,
-    location: "Downtown Medical Center",
-  },
-  {
-    name: "Michael Chen",
-    bloodType: "A+",
-    distance: "2.8 km",
-    lastDonation: "4 months ago",
-    isAvailable: true,
-    donationCount: 8,
-    location: "City Hospital",
-  },
-  {
-    name: "Emily Rodriguez",
-    bloodType: "B-",
-    distance: "3.5 km",
-    lastDonation: "2 months ago",
-    isAvailable: false,
-    donationCount: 15,
-    location: "Red Cross Center",
-  },
-  {
-    name: "David Kim",
-    bloodType: "AB+",
-    distance: "4.1 km",
-    lastDonation: "5 months ago",
-    isAvailable: true,
-    donationCount: 6,
-    location: "Community Blood Bank",
-  },
-  {
-    name: "Jessica Patel",
-    bloodType: "O-",
-    distance: "5.2 km",
-    lastDonation: "6 months ago",
-    isAvailable: true,
-    donationCount: 20,
-    location: "University Hospital",
-  },
-  {
-    name: "Robert Wilson",
-    bloodType: "A-",
-    distance: "6.8 km",
-    lastDonation: "4 months ago",
-    isAvailable: true,
-    donationCount: 10,
-    location: "Regional Medical Center",
-  },
-];
+import { getDonors, User } from "@/lib/localDatabase";
 
 export function DonorsList() {
+  const [donors, setDonors] = useState<User[]>([]);
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    const loadedDonors = getDonors();
+    setDonors(loadedDonors);
+  }, []);
+
+  const displayedDonors = showAll ? donors : donors.slice(0, 6);
+
   return (
     <section id="find" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -70,38 +26,51 @@ export function DonorsList() {
             </h2>
             <p className="text-muted-foreground flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              Showing results for your current location
+              Showing {displayedDonors.length} of {donors.length} registered donors
             </p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4" />
-              Filter
-            </Button>
-            <Button variant="outline" size="sm">
-              <ArrowUpDown className="w-4 h-4" />
-              Sort
-            </Button>
+            <Link to="/dashboard?tab=donors">
+              <Button variant="outline" size="sm">
+                <Filter className="w-4 h-4" />
+                View All
+              </Button>
+            </Link>
+            <Link to="/signup">
+              <Button size="sm">
+                Register as Donor
+              </Button>
+            </Link>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockDonors.map((donor, index) => (
+          {displayedDonors.map((donor, index) => (
             <div
-              key={donor.name}
+              key={donor.id}
               className="animate-fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <DonorCard {...donor} />
+              <DonorCard 
+                name={donor.name}
+                bloodType={donor.bloodType}
+                distance={`${(Math.random() * 5 + 1).toFixed(1)} km`}
+                lastDonation={donor.lastDonation ? `${Math.floor((Date.now() - new Date(donor.lastDonation).getTime()) / (1000 * 60 * 60 * 24 * 30))} months ago` : 'New donor'}
+                isAvailable={donor.isAvailable}
+                donationCount={donor.donationCount}
+                location={donor.location}
+              />
             </div>
           ))}
         </div>
 
-        <div className="flex justify-center mt-12">
-          <Button variant="outline" size="lg">
-            Load More Donors
-          </Button>
-        </div>
+        {donors.length > 6 && !showAll && (
+          <div className="flex justify-center mt-12">
+            <Button variant="outline" size="lg" onClick={() => setShowAll(true)}>
+              Load More Donors
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
